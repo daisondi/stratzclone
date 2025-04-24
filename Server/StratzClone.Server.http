@@ -1,0 +1,6 @@
+@StratzClone.Server_HostAddress = http://localhost:5179
+
+GET {{StratzClone.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
