@@ -27,10 +27,13 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = SteamAuthenticationDefaults.AuthenticationScheme;
 })
 .AddCookie(options =>
-{
+  {
     options.Cookie.SameSite = SameSiteMode.None;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-})
+    // Only require Secure in production
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+    ? CookieSecurePolicy.None
+    : CookieSecurePolicy.Always;
+  })
 .AddSteam(options =>
 {
     options.ApplicationKey = builder.Configuration["Steam:ApiKey"];
