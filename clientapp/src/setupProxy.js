@@ -1,15 +1,13 @@
-// clientapp/src/setupProxy.js
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-module.exports = function (app) {
+module.exports = app => {
   app.use(
-    '/api',                                      // proxy only API calls
+    '/api',
     createProxyMiddleware({
-      target: 'https://localhost:7065',          // ASP.NET Core dev server
-      secure: false,                             // accept self-signed TLS cert
-      changeOrigin: true,                        // Host header = target
-      cookieDomainRewrite: 'localhost',          // let auth cookie stick
-      logLevel: 'debug'                          // verbose proxy logs
+      target: 'https://localhost:7065',
+      secure: false,         // accept self-signed cert
+      changeOrigin: true,
+      logLevel: 'debug'
     })
   );
 };
