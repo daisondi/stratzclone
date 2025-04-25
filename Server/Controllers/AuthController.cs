@@ -3,14 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Linq;
-using System.Threading.Tasks;
 using stratzclone.Server.Data;
 using stratzclone.Server.Models;
 
- 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
@@ -20,60 +15,76 @@ public class AuthController : ControllerBase
 
     public AuthController(ApplicationDbContext db, IConfiguration config)
     {
-        _db = db;
+        _db     = db;
         _config = config;
     }
 
-    // existing login kickoff
+    // ───────────────────────────────────────────────────────────────
+    // 1) Kick-off: /api/auth/steam/login
+    // ───────────────────────────────────────────────────────────────
     [HttpGet("steam/login")]
     public IActionResult SteamLogin([FromQuery] string returnUrl = "/")
     {
+        Console.WriteLine($"[SteamLogin] redirect to Steam, returnUrl = {returnUrl}");
         var props = new AuthenticationProperties { RedirectUri = returnUrl };
         return Challenge(props, SteamAuthenticationDefaults.AuthenticationScheme);
     }
 
-    // new “who am I” endpoint
+    // ───────────────────────────────────────────────────────────────
+    // 2) “Who am I”:  /api/auth/steam/me   (requires cookie)
+    // ───────────────────────────────────────────────────────────────
     [Authorize]
     [HttpGet("steam/me")]
     public async Task<IActionResult> Me()
     {
-        // 1) pull the OpenID claim
+        Console.WriteLine("[Me] endpoint hit");
+
+        // 2-a) OpenID claim
         var openId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (openId == null) 
+        Console.WriteLine($"[Me] openId   : {openId}");
+        if (openId == null) {
+            Console.WriteLine("[Me] openId missing → 401");
             return Unauthorized();
+        }
 
-        // 2) extract Steam64 ID
+        // 2-b) Steam64 ID
         var steam64 = openId.TrimEnd('/').Split('/').Last();
+        Console.WriteLine($"[Me] steam64  : {steam64}");
 
-        // 3) fetch from Steam Web API
+        // 2-c) Steam Web API call
         var apiKey = _config["Steam:ApiKey"];
-        var url = $"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={apiKey}&steamids={steam64}";
+        var url    = $"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={apiKey}&steamids={steam64}";
+        Console.WriteLine($"[Me] Steam API: {url}");
+
         using var http = new HttpClient();
         var resp = await http.GetFromJsonAsync<SteamProfileResponse>(url);
         var info = resp?.response.players?.FirstOrDefault();
-        if (info == null) 
+        if (info == null) {
+            Console.WriteLine("[Me] Steam returned 0 players → 404");
             return NotFound();
+        }
+        Console.WriteLine($"[Me] persona  : {info.personaname}");
 
-        // 4) (optional) upsert into the DB
+        // 2-d) Upsert DB row
         var player = await _db.Players.FindAsync(steam64);
-        if (player == null)
-        {
+        if (player == null) {
+            Console.WriteLine("[Me] inserting new player");
             player = new Player {
                 SteamId     = info.steamid,
                 DisplayName = info.personaname,
                 Username    = info.personaname
             };
             _db.Players.Add(player);
-        }
-        else
-        {
+        } else {
+            Console.WriteLine("[Me] updating existing player");
             player.DisplayName = info.personaname;
             player.Username    = info.personaname;
             _db.Players.Update(player);
         }
         await _db.SaveChangesAsync();
+        Console.WriteLine("[Me] DB save completed");
 
-        // 5) return it
+        // 2-e) Return JSON
         return Ok(player);
     }
 }

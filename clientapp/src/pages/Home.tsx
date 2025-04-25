@@ -14,21 +14,19 @@ const Home: React.FC = () => {
 
   // Try to load the logged-in user on mount
   useEffect(() => {
-    fetch('/api/auth/steam/me', { credentials: 'include' })
-      .then(res => {
-        if (!res.ok) throw new Error('Not logged in');
-        return res.json() as Promise<Player>;
-      })
+    fetch('/api/auth/steam/me', { credentials: 'include' })  //   ← /api/...
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(setPlayer)
       .catch(() => setPlayer(null));
   }, []);
 
   const handleSteamLogin = () => {
     const returnUrl = encodeURIComponent(window.location.origin + '/');
-    window.location.href =
-      `http://localhost:5179/api/auth/steam/login?returnUrl=${returnUrl}`;
+    // use the same scheme/port that the SPA will call later
+    window.location.href = 'https://localhost:7065/api/auth/steam/login?returnUrl=' + returnUrl;
   };
-
+  
+  
   if (player) {
     // Show saved info
     return (

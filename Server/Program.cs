@@ -26,14 +26,11 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = SteamAuthenticationDefaults.AuthenticationScheme;
 })
-.AddCookie(options =>
-  {
-    options.Cookie.SameSite = SameSiteMode.None;
-    // Only require Secure in production
-    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
-    ? CookieSecurePolicy.None
-    : CookieSecurePolicy.Always;
-  })
+.AddCookie(o =>
+{
+    o.Cookie.SameSite    = SameSiteMode.None;
+    o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+})
 .AddSteam(options =>
 {
     options.ApplicationKey = builder.Configuration["Steam:ApiKey"];
@@ -52,8 +49,7 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// (optional) redirect HTTP → HTTPS
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseCors();
 app.UseAuthentication();
