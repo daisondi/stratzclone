@@ -21,10 +21,11 @@ const Home: React.FC = () => {
   }, []);
 
   const handleSteamLogin = () => {
-    const returnUrl = encodeURIComponent(window.location.origin + '/');
-    // use the same scheme/port that the SPA will call later
-    window.location.href = 'https://localhost:7065/api/auth/steam/login?returnUrl=' + returnUrl;
+    const ret = encodeURIComponent(window.location.origin + '/');
+    window.location.href =
+      'https://localhost:7065/api/auth/steam/login?returnUrl=' + ret;
   };
+  
   
   
   if (player) {

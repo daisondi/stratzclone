@@ -11,7 +11,7 @@ using stratzclone.Server.Data;
 namespace StratzClone.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250424231602_InitialCreate")]
+    [Migration("20250425013433_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
