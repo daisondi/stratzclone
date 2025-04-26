@@ -1,43 +1,41 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace StratzClone.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMatchItemTables : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "Username",
-                table: "Players",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "DisplayName",
-                table: "Players",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
             migrationBuilder.CreateTable(
                 name: "Matches",
                 columns: table => new
                 {
-                    MatchId = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MatchId = table.Column<long>(type: "bigint", nullable: false),
                     DurationSecs = table.Column<int>(type: "int", nullable: false),
-                    DidRadiantWin = table.Column<bool>(type: "bit", nullable: false)
+                    DidRadiantWin = table.Column<bool>(type: "bit", nullable: false),
+                    StartDateUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Matches", x => x.MatchId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Players",
+                columns: table => new
+                {
+                    SteamId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Players", x => x.SteamId);
                 });
 
             migrationBuilder.CreateTable(
@@ -114,25 +112,8 @@ namespace StratzClone.Server.Migrations
             migrationBuilder.DropTable(
                 name: "Matches");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Username",
-                table: "Players",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "DisplayName",
-                table: "Players",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
+            migrationBuilder.DropTable(
+                name: "Players");
         }
     }
 }

@@ -15,37 +15,39 @@ namespace stratzclone.Server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Player
+            // Player (external key)
             modelBuilder.Entity<Player>()
                         .HasKey(p => p.SteamId);
+            modelBuilder.Entity<Player>()
+                        .Property(p => p.SteamId)
+                        .ValueGeneratedNever();
 
-            // Match
+            // Match (external ID)
             modelBuilder.Entity<Match>()
                         .HasKey(m => m.MatchId);
+            modelBuilder.Entity<Match>()
+                        .Property(m => m.MatchId)
+                        .ValueGeneratedNever();
 
-            // PlayerMatch
+            // PlayerMatch (composite key)
             modelBuilder.Entity<PlayerMatch>()
                         .HasKey(pm => new { pm.MatchId, pm.SteamId });
-
             modelBuilder.Entity<PlayerMatch>()
                         .HasOne(pm => pm.Match)
                         .WithMany(m  => m.PlayerMatches)
                         .HasForeignKey(pm => pm.MatchId);
-
             modelBuilder.Entity<PlayerMatch>()
                         .HasOne(pm => pm.Player)
                         .WithMany(p  => p.PlayerMatches)
                         .HasForeignKey(pm => pm.SteamId);
 
-            // PlayerMatchItem
+            // PlayerMatchItem (composite key)
             modelBuilder.Entity<PlayerMatchItem>()
                         .HasKey(i => new { i.MatchId, i.SteamId, i.ItemSeq });
-
             modelBuilder.Entity<PlayerMatchItem>()
                         .HasOne(i => i.PlayerMatch)
                         .WithMany(pm => pm.Items)
                         .HasForeignKey(i => new { i.MatchId, i.SteamId });
-
             modelBuilder.Entity<PlayerMatchItem>()
                         .HasIndex(i => i.ItemId);
         }

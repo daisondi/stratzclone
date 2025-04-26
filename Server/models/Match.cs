@@ -7,6 +7,7 @@ namespace stratzclone.Server.Models
         public long MatchId { get; set; }           // PK
         public int  DurationSecs { get; set; }
         public bool DidRadiantWin { get; set; }
+        public DateTime StartDateUtc { get; set; }
 
         public ICollection<PlayerMatch> PlayerMatches { get; set; }
             = new List<PlayerMatch>();
