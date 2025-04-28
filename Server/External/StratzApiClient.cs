@@ -14,7 +14,7 @@ namespace stratzclone.Server.External
     {
         private readonly HttpClient _http;
         private const int DefaultSkip = 0;
-        private const int DefaultTake = 20;
+        private const int DefaultTake = 200;
 
         public StratzApiClient(HttpClient http)
         {
@@ -107,6 +107,62 @@ namespace stratzclone.Server.External
 
             return outList;
         }
+         public async Task<IEnumerable<PlayerMatch>> GetPlayerMatchesAsync(
+        string steamId,
+        int skip = 0,
+        int take = 100
+    )
+    {
+        if (!long.TryParse(steamId, out var accountId))
+            throw new ArgumentException("Invalid Steam64 ID", nameof(steamId));
+
+        var payload = new
+        {
+            query = GraphQLQueries.GetPlayerMatches,
+            variables = new
+            {
+                steamAccountId = accountId,
+                skip,
+                take
+            }
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "graphql")
+        {
+            Content = JsonContent.Create(payload)
+        };
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var resp = await _http.SendAsync(request);
+        resp.EnsureSuccessStatusCode();
+
+        var gql = await resp.Content
+            .ReadFromJsonAsync<GraphQLResponse<PlayerMatchesData>>();
+
+        var matchesDto = gql?.Data?.Player?.Matches
+            ?? Array.Empty<GraphQLMatchDto>();
+
+        // Flatten out only the PlayerMatch records
+        var playerMatches = new List<PlayerMatch>();
+        foreach (var m in matchesDto)
+        {
+            foreach (var p in m.Players)
+            {
+                playerMatches.Add(new PlayerMatch
+                {
+                    MatchId = m.Id,
+                    SteamId = p.SteamId,
+                    IsRadiant  = p.IsRadiant, 
+                    HeroId = p.HeroId,
+                    Kills = p.Kills,
+                    Deaths = p.Deaths,
+                    Assists = p.Assists
+                });
+            }
+        }
+
+        return playerMatches;
+    }
 
         private class GraphQLResponse<T>
         {
@@ -141,6 +197,8 @@ namespace stratzclone.Server.External
         private class GraphQLPlayerDto
         {
             public string SteamId { get; set; } = default!;
+            
+            public bool IsRadiant { get; set; }   
             public int HeroId { get; set; }
             public int Kills { get; set; }
             public int Deaths { get; set; }
