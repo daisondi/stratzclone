@@ -11,5 +11,6 @@ namespace stratzclone.Server.Interfaces
         /// Returns the matches that were saved.
         /// </summary>
         Task<IEnumerable<Match>> FetchAndSaveMatchesAsync(string steamId);
+       Task<IEnumerable<PlayerMatch>> FetchAndSavePlayerMatchesAsync(string steamId);
     }
 }

@@ -8,21 +8,22 @@ using stratzclone.Server.Models;
 
 namespace stratzclone.Server.Services
 {
+
     public class MatchService : IMatchService
     {
-        private readonly IStratzApiClient    _api;
+        private readonly IStratzApiClient _api;
         private readonly ApplicationDbContext _db;
 
         public MatchService(IStratzApiClient api, ApplicationDbContext db)
         {
             _api = api;
-            _db  = db;
+            _db = db;
         }
 
         public async Task<IEnumerable<Match>> FetchAndSaveMatchesAsync(string steamId)
         {
             var fetched = await _api.GetRecentMatchesAsync(steamId);
-            var toSave  = new List<Match>();
+            var toSave = new List<Match>();
 
             foreach (var match in fetched)
             {
@@ -41,6 +42,29 @@ namespace stratzclone.Server.Services
 
                 _db.Matches.Add(match);
                 toSave.Add(match);
+            }
+
+            if (toSave.Any())
+                await _db.SaveChangesAsync();
+
+            return toSave;
+        }
+        public async Task<IEnumerable<PlayerMatch>> FetchAndSavePlayerMatchesAsync(string steamId)
+        {
+            var playerMatches = await _api.GetPlayerMatchesAsync(steamId);
+            var toSave = new List<PlayerMatch>();
+
+            foreach (var pm in playerMatches)
+            {
+                var exists = await _db.PlayerMatches
+                    .AsNoTracking()
+                    .AnyAsync(x => x.MatchId == pm.MatchId && x.SteamId == pm.SteamId);
+
+                if (exists)
+                    continue;
+
+                _db.PlayerMatches.Add(pm);
+                toSave.Add(pm);
             }
 
             if (toSave.Any())

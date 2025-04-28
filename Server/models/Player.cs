@@ -12,6 +12,7 @@ namespace stratzclone.Server.Models
         public string? DisplayName { get; set; }          // optional / nullable
         public string? Username    { get; set; }
 
+
         // ── navigation to the link-table ───────────────
         public ICollection<PlayerMatch> PlayerMatches { get; set; } =
             new List<PlayerMatch>();

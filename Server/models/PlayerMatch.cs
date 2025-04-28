@@ -11,6 +11,7 @@ namespace stratzclone.Server.Models
         public int Kills   { get; set; }
         public int Deaths  { get; set; }
         public int Assists { get; set; }
+        public bool IsRadiant {get; set;}
 
         public Match  Match  { get; set; } = null!;
         public Player Player { get; set; } = null!;
