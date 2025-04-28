@@ -22,55 +22,85 @@ namespace stratzclone.Server.Services
 
         public async Task<IEnumerable<Match>> FetchAndSaveMatchesAsync(string steamId)
         {
-            var fetched = await _api.GetRecentMatchesAsync(steamId);
-            var toSave = new List<Match>();
+            var toSaveAll = new List<Match>();
+            var skip = 0;
+            const int take = 100; // batch size
 
-            foreach (var match in fetched)
+            while (true)
             {
-                var exists = await _db.Matches
-                                      .AsNoTracking()
-                                      .AnyAsync(m => m.MatchId == match.MatchId);
-                if (exists) continue;
+                // Fetch a page of matches
+                var batch = await _api.GetRecentMatchesAsync(steamId, skip, take);
 
-                // hook up navigations
-                foreach (var pm in match.PlayerMatches)
+                // Filter out already-saved matches
+                var newMatches = batch
+                    .Where(m => !_db.Matches
+                        .AsNoTracking()
+                        .Any(x => x.MatchId == m.MatchId))
+                    .ToList();
+
+                // If no new matches found, exit the loop
+                if (!newMatches.Any())
+                    break;
+
+                // Hook up navigations and add each new match
+                foreach (var match in newMatches)
                 {
-                    pm.Match = match;
-                    foreach (var item in pm.Items)
-                        item.PlayerMatch = pm;
+                    foreach (var pm in match.PlayerMatches)
+                    {
+                        pm.Match = match;
+                        foreach (var item in pm.Items)
+                            item.PlayerMatch = pm;
+                    }
+                    _db.Matches.Add(match);
                 }
 
-                _db.Matches.Add(match);
-                toSave.Add(match);
+                // Persist this batch of new matches
+                await _db.SaveChangesAsync();
+                toSaveAll.AddRange(newMatches);
+
+                // Advance to the next page
+                skip += take;
             }
 
-            if (toSave.Any())
-                await _db.SaveChangesAsync();
-
-            return toSave;
+            return toSaveAll;
         }
+
+
         public async Task<IEnumerable<PlayerMatch>> FetchAndSavePlayerMatchesAsync(string steamId)
         {
-            var playerMatches = await _api.GetPlayerMatchesAsync(steamId);
             var toSave = new List<PlayerMatch>();
+            var skip = 0;
+            const int take = 100; // batch size for player matches
 
-            foreach (var pm in playerMatches)
+            while (true)
             {
-                var exists = await _db.PlayerMatches
-                    .AsNoTracking()
-                    .AnyAsync(x => x.MatchId == pm.MatchId && x.SteamId == pm.SteamId);
+                // Fetch a page of player-match records
+                var batch = await _api.GetPlayerMatchesAsync(steamId, skip, take);
 
-                if (exists)
-                    continue;
+                // Filter out already-saved player matches
+                var newPms = batch
+                    .Where(pm => !_db.PlayerMatches
+                        .AsNoTracking()
+                        .Any(x => x.MatchId == pm.MatchId && x.SteamId == pm.SteamId))
+                    .ToList();
 
-                _db.PlayerMatches.Add(pm);
-                toSave.Add(pm);
+                // If no new entries, break out
+                if (!newPms.Any())
+                    break;
+
+                // Add and collect
+                foreach (var pm in newPms)
+                {
+                    _db.PlayerMatches.Add(pm);
+                    toSave.Add(pm);
+                }
+
+                await _db.SaveChangesAsync();
+                skip += take;
             }
 
-            if (toSave.Any())
-                await _db.SaveChangesAsync();
-
             return toSave;
+
         }
     }
 }
