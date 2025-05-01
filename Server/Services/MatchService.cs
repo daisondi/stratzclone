@@ -66,41 +66,5 @@ namespace stratzclone.Server.Services
         }
 
 
-        public async Task<IEnumerable<PlayerMatch>> FetchAndSavePlayerMatchesAsync(string steamId)
-        {
-            var toSave = new List<PlayerMatch>();
-            var skip = 0;
-            const int take = 100; // batch size for player matches
-
-            while (true)
-            {
-                // Fetch a page of player-match records
-                var batch = await _api.GetPlayerMatchesAsync(steamId, skip, take);
-
-                // Filter out already-saved player matches
-                var newPms = batch
-                    .Where(pm => !_db.PlayerMatches
-                        .AsNoTracking()
-                        .Any(x => x.MatchId == pm.MatchId && x.SteamId == pm.SteamId))
-                    .ToList();
-
-                // If no new entries, break out
-                if (!newPms.Any())
-                    break;
-
-                // Add and collect
-                foreach (var pm in newPms)
-                {
-                    _db.PlayerMatches.Add(pm);
-                    toSave.Add(pm);
-                }
-
-                await _db.SaveChangesAsync();
-                skip += take;
-            }
-
-            return toSave;
-
-        }
     }
 }

@@ -8,13 +8,11 @@ namespace stratzclone.Server.Models
     {
         [Key]
         public string SteamId { get; set; } = null!;      // Steam-64, e.g. "76561198012345678"
-
+        public string? SteamId32 { get; set; }       // Steam-32, e.g. "12345678"
+        public string? ProfilePictureUrl { get; set; }
         public string? DisplayName { get; set; }          // optional / nullable
         public string? Username    { get; set; }
 
 
-        // ── navigation to the link-table ───────────────
-        public ICollection<PlayerMatch> PlayerMatches { get; set; } =
-            new List<PlayerMatch>();
     }
 }

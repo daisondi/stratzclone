@@ -1,0 +1,95 @@
+/* src/pages/Main.module.css */
+.page {
+    min-height: 100vh;
+    background-color: #121212;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+  
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #ccc;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .avatar {
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    border: 2px solid #333;
+  }
+  
+  .name {
+    margin-top: 1rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+  }
+  
+  .tabsWrapper {
+    width: 100%;
+    max-width: 480px;
+    margin-bottom: 2rem;
+  }
+  
+  .tabs {
+    position: relative;
+    display: flex;
+    background-color: #1f1f1f;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .tab {
+    flex: 1;
+    padding: 1rem 0;
+    text-align: center;
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 1;
+    transition: color 0.2s;
+  }
+  
+  .tab:hover {
+    color: #fff;
+  }
+  
+  .active {
+    color: #fff;
+  }
+  
+  .underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: calc(100% / 3);
+    height: 3px;
+    background-color: #1db954; /* you can swap for an accent color you like */
+    transition: transform 0.3s ease;
+  }
+  
+  .contentWrapper {
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  .content {
+    background-color: #1f1f1f;
+    padding: 2rem;
+    border-radius: 8px;
+    color: #ddd;
+    min-height: 300px;
+  }
+  
