@@ -1,0 +1,87 @@
+/* Matches.module.css */
+
+.container {
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .tableWrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .th,
+  .td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .winRow {
+    background-color: #e6f9e6;
+  }
+  
+  .lossRow {
+    background-color: #f9e6e6;
+  }
+  
+  .heroCell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .heroIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+  }
+  
+  .items {
+    display: flex;
+    gap: 0.25rem;
+  }
+  
+  .itemIcon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+  }
+  
+  .pager {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .button {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+  }
+  
+  .button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .pageInfo {
+    font-size: 0.9rem;
+  }
+  

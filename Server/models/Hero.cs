@@ -1,15 +1,19 @@
-using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
-namespace stratzclone.Server.Models
+namespace StratzClone.Server.Models
 {
-    public class Hero
-    {
-        public int HeroId { get; set; }           // PK
-        public string  name { get; set; }
-        
-        public string  localized_name { get; set; }
+public class Hero
+{
+    [JsonPropertyName("id")]
+    public int HeroId { get; set; }                  // numeric ID
 
-        public string pictureUrl { get; set; }
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "";           // internal name (npc_dota_hero_…)
 
-    }
+    [JsonPropertyName("localized_name")]
+    public string LocalizedName { get; set; } = "";  // Crystal Maiden, etc.
+
+    [JsonPropertyName("pictureUrl")]
+    public string PictureUrl { get; set; } = "";     // https://cdn.dota2.com/…
+}
 }
