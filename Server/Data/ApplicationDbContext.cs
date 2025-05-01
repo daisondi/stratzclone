@@ -36,10 +36,7 @@ namespace stratzclone.Server.Data
                         .HasOne(pm => pm.Match)
                         .WithMany(m  => m.PlayerMatches)
                         .HasForeignKey(pm => pm.MatchId);
-            modelBuilder.Entity<PlayerMatch>()
-                        .HasOne(pm => pm.Player)
-                        .WithMany(p  => p.PlayerMatches)
-                        .HasForeignKey(pm => pm.SteamId);
+
 
             // PlayerMatchItem (composite key)
             modelBuilder.Entity<PlayerMatchItem>()

@@ -15,7 +15,7 @@ public class AuthController : ControllerBase
 
     public AuthController(ApplicationDbContext db, IConfiguration config)
     {
-        _db     = db;
+        _db = db;
         _config = config;
     }
 
@@ -42,7 +42,8 @@ public class AuthController : ControllerBase
         // 2-a) OpenID claim
         var openId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         Console.WriteLine($"[Me] openId   : {openId}");
-        if (openId == null) {
+        if (openId == null)
+        {
             Console.WriteLine("[Me] openId missing → 401");
             return Unauthorized();
         }
@@ -53,32 +54,44 @@ public class AuthController : ControllerBase
 
         // 2-c) Steam Web API call
         var apiKey = _config["Steam:ApiKey"];
-        var url    = $"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={apiKey}&steamids={steam64}";
+        var url = $"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={apiKey}&steamids={steam64}";
         Console.WriteLine($"[Me] Steam API: {url}");
 
         using var http = new HttpClient();
         var resp = await http.GetFromJsonAsync<SteamProfileResponse>(url);
         var info = resp?.response.players?.FirstOrDefault();
-        if (info == null) {
+        if (info == null)
+        {
             Console.WriteLine("[Me] Steam returned 0 players → 404");
             return NotFound();
         }
         Console.WriteLine($"[Me] persona  : {info.personaname}");
-
+        // ── compute SteamID32 ────────────────────────────────────
+        // Steam32 = steam64 - 76561197960265728
+        var sid64 = ulong.Parse(info.steamid);
+        var sid32 = (sid64 - 76561197960265728UL).ToString();
         // 2-d) Upsert DB row
         var player = await _db.Players.FindAsync(steam64);
-        if (player == null) {
+        if (player == null)
+        {
             Console.WriteLine("[Me] inserting new player");
-            player = new Player {
-                SteamId     = info.steamid,
+            player = new Player
+            {
+                SteamId32 = sid32,
+                SteamId = info.steamid,
                 DisplayName = info.personaname,
-                Username    = info.personaname
+                Username = info.personaname,
+                ProfilePictureUrl = info.avatarfull
             };
             _db.Players.Add(player);
-        } else {
+        }
+        else
+        {
             Console.WriteLine("[Me] updating existing player");
             player.DisplayName = info.personaname;
-            player.Username    = info.personaname;
+            player.Username = info.personaname;
+            player.SteamId32 = sid32;
+            player.ProfilePictureUrl = info.avatarfull;
             _db.Players.Update(player);
         }
         await _db.SaveChangesAsync();

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using stratzclone.Server.Interfaces;
 using stratzclone.Server.Models;
 using stratzclone.Server.External;
-
+using System.Text.Json.Serialization;
 namespace stratzclone.Server.External
 {
     public class StratzApiClient : IStratzApiClient
@@ -82,26 +82,21 @@ namespace stratzclone.Server.External
                     var pm = new PlayerMatch
                     {
                         MatchId = match.MatchId,
-                        SteamId = p.SteamId,
+                        SteamId = p.SteamId.ToString(),
                         HeroId = p.HeroId,
                         Kills = p.Kills,
                         Deaths = p.Deaths,
-                        Assists = p.Assists
+                        Assists = p.Assists,
+                        IsRadiant = p.IsRadiant,
+                        Item0Id = p.Item0Id ?? 0,
+                        Item1Id = p.Item1Id ?? 0,
+                        Item2Id = p.Item2Id ?? 0,
+                        Item3Id = p.Item3Id ?? 0,
+                        Item4Id = p.Item4Id ?? 0,
+                        Item5Id = p.Item5Id ?? 0
                     };
 
-                    foreach (var it in p.Items)
-                    {
-                        pm.Items.Add(new PlayerMatchItem
-                        {
-                            MatchId = match.MatchId,
-                            SteamId = pm.SteamId,
-                            ItemSeq = it.Sequence,
-                            ItemId = it.ItemId,
-                            PurchaseTime = it.Time,
-                            IsNeutral = it.Neutral,
-                            Charges = it.Charges
-                        });
-                    }
+
 
                     match.PlayerMatches.Add(pm);
                 }
@@ -111,62 +106,7 @@ namespace stratzclone.Server.External
 
             return outList;
         }
-        public async Task<IEnumerable<PlayerMatch>> GetPlayerMatchesAsync(
-        string steamId,
-        int skip = 0,
-        int take = 100
-    )
-        {
-            if (!long.TryParse(steamId, out var accountId))
-                throw new ArgumentException("Invalid Steam64 ID", nameof(steamId));
 
-            var payload = new
-            {
-                query = GraphQLQueries.GetPlayerMatches,
-                variables = new
-                {
-                    steamAccountId = accountId,
-                    skip,
-                    take
-                }
-            };
-
-            var request = new HttpRequestMessage(HttpMethod.Post, "graphql")
-            {
-                Content = JsonContent.Create(payload)
-            };
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-            var resp = await _http.SendAsync(request);
-            resp.EnsureSuccessStatusCode();
-
-            var gql = await resp.Content
-                .ReadFromJsonAsync<GraphQLResponse<PlayerMatchesData>>();
-
-            var matchesDto = gql?.Data?.Player?.Matches
-                ?? Array.Empty<GraphQLMatchDto>();
-
-            // Flatten out only the PlayerMatch records
-            var playerMatches = new List<PlayerMatch>();
-            foreach (var m in matchesDto)
-            {
-                foreach (var p in m.Players)
-                {
-                    playerMatches.Add(new PlayerMatch
-                    {
-                        MatchId = m.Id,
-                        SteamId = p.SteamId,
-                        IsRadiant = p.IsRadiant,
-                        HeroId = p.HeroId,
-                        Kills = p.Kills,
-                        Deaths = p.Deaths,
-                        Assists = p.Assists
-                    });
-                }
-            }
-
-            return playerMatches;
-        }
 
         private class GraphQLResponse<T>
         {
@@ -200,15 +140,21 @@ namespace stratzclone.Server.External
 
         private class GraphQLPlayerDto
         {
-            public string SteamId { get; set; } = default!;
-
+            [JsonPropertyName("steamAccountId")]
+            public long SteamId { get; set; }
+            [JsonPropertyName("isRadiant")]
             public bool IsRadiant { get; set; }
             public int HeroId { get; set; }
             public int Kills { get; set; }
             public int Deaths { get; set; }
             public int Assists { get; set; }
-            public GraphQLItemDto[] Items { get; set; }
-                = Array.Empty<GraphQLItemDto>();
+            // ─── allow nulls ───
+            [JsonPropertyName("item0Id")] public int? Item0Id { get; set; }
+            [JsonPropertyName("item1Id")] public int? Item1Id { get; set; }
+            [JsonPropertyName("item2Id")] public int? Item2Id { get; set; }
+            [JsonPropertyName("item3Id")] public int? Item3Id { get; set; }
+            [JsonPropertyName("item4Id")] public int? Item4Id { get; set; }
+            [JsonPropertyName("item5Id")] public int? Item5Id { get; set; }
         }
 
         private class GraphQLItemDto

@@ -1,13 +1,8 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
-
-module.exports = app => {
+// clientapp/src/setupProxy.js
+const { legacyCreateProxyMiddleware } = require('http-proxy-middleware');
+module.exports = function(app) {
   app.use(
     '/api',
-    createProxyMiddleware({
-      target: 'https://localhost:7065',
-      secure: false,         // accept self-signed cert
-      changeOrigin: true,
-      logLevel: 'debug'
-    })
+    legacyCreateProxyMiddleware({ target: 'https://localhost:7065', changeOrigin: true, secure: false, logLevel: 'debug' })
   );
 };

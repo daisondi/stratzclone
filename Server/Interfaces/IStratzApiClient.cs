@@ -10,6 +10,5 @@ namespace stratzclone.Server.Interfaces
         /// Fetches the most recent matches for the given Steam-64 ID.
         /// </summary>
         Task<IEnumerable<Match>> GetRecentMatchesAsync(string steamId, int skip, int take);
-        Task<IEnumerable<PlayerMatch>> GetPlayerMatchesAsync(string steamId, int skip, int take);
     }
 }

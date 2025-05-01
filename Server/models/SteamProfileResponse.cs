@@ -15,6 +15,7 @@ namespace stratzclone.Server.Models
     {
         public string steamid { get; set; }
         public string personaname { get; set; }
+         public string avatarfull { get; set; }
         // add other fields here if you need them
     }
 }
