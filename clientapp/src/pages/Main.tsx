@@ -1,7 +1,7 @@
 // src/pages/Main.tsx
 import React, { useEffect, useState } from 'react';
 import styles from './Main.module.css';
-
+import Matches from './Matches';
 type Tab = 'matches' | 'recommendations' | 'graphics';
 
 interface Player {
@@ -38,7 +38,7 @@ const Main: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'matches':
-        return <div className={styles.content}>[Matches list will go here]</div>;
+        return <Matches />;
       case 'recommendations':
         return <div className={styles.content}>[Recommendations will go here]</div>;
       case 'graphics':

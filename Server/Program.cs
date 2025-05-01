@@ -7,8 +7,8 @@ using stratzclone.Server.External;
 using stratzclone.Server.Interfaces;
 using stratzclone.Server.Services;
 using System.Net.Http.Headers;
-
-
+using StratzClone.Server.Constants;
+using StratzClone.Server.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // 1) CORS
@@ -60,6 +60,7 @@ builder.Services.AddScoped<IMatchService, MatchService>();
 // 5) MVC
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+builder.Services.AddSingleton<IConstantsCache, ConstantsCache>();
 
 var app = builder.Build();
 

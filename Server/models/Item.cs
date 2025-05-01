@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-
-namespace stratzclone.Server.Models
+using System.Text.Json.Serialization;
+namespace StratzClone.Server.Models
 {
     public class Item
     {
-        public int ItemId { get; set; }           // PK
-        public string  name { get; set; }
-        public string url_image { get; set; }
+        [JsonPropertyName("id")] public int ItemId { get; set; }           // PK
+        [JsonPropertyName("name")] public string name { get; set; }
+        [JsonPropertyName("url_image")] public string url_image { get; set; }
 
     }
 }

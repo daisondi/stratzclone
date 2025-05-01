@@ -1,4 +1,6 @@
-public class MatchViewModel
+namespace StratzClone.Server.Models
+{
+    public class MatchViewModel
 {
     // Basic identifiers
     public long MatchId { get; set; }
@@ -6,7 +8,7 @@ public class MatchViewModel
     public TimeSpan Duration { get; set; }
     
     // Hero
-    public int HeroId { get; set; }
+    public Hero Hero { get; set; }
     
     // Outcome
     public bool IsWin { get; set; } 
@@ -17,11 +19,12 @@ public class MatchViewModel
     public int Deaths { get; set; }
     public int Assists { get; set; }
     
-        public int Item0url { get; set; }
-        public int Item1url { get; set; }
-        public int Item2url { get; set; }
-        public int Item3url { get; set; }
-        public int Item4url { get; set; }
-        public int Item5url { get; set; }
+        public Item Item0 { get; set; }
+        public Item Item1 { get; set; }
+        public Item Item2 { get; set; }
+        public Item Item3 { get; set; }
+        public Item Item4 { get; set; }
+        public Item Item5 { get; set; }
 
+}
 }

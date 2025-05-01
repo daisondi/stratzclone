@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Main from './pages/Main';
+import Matches from './pages/Matches';
 // …other imports
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/main" element={<Main />} />
+        <Route path="/matches" element={<Matches />} />
         {/* <Route path="/matches" element={<Matches />} /> */}
       </Routes>
     </BrowserRouter>
