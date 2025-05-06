@@ -1,11 +1,13 @@
+// src/pages/Matches.tsx
 import React, { useEffect, useState } from "react";
+import { useParams } from 'react-router-dom';
 import styles from "./Matches.module.css";
 
 // ---------- Types ---------- //
 interface Item {
   id: number;
   name: string;
-  icon: string; // CDN url
+  url_image: string; // CDN url
 }
 
 interface Hero {
@@ -47,19 +49,22 @@ const formatDuration = (iso: string) => {
 
 // ---------- Component ---------- //
 export default function Matches() {
+  const { steam32 } = useParams<{ steam32: string }>();
   const [page, setPage] = useState(1);
   const [paged, setPaged] = useState<Paged<Match> | null>(null);
   const [loading, setLoading] = useState(false);
   const pageSize = 20;
 
   useEffect(() => {
+    if (!steam32) return; // no id, skip
     let cancelled = false;
     const fetchPage = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/viewmatches?page=${page}&pageSize=${pageSize}`, {
-          credentials: 'include'
-        })
+        const res = await fetch(
+          `/api/viewmatches/${steam32}?page=${page}&pageSize=${pageSize}`,
+          { credentials: 'include' }
+        );
         if (!res.ok) throw new Error(await res.text());
         const data: Paged<Match> = await res.json();
         if (!cancelled) setPaged(data);
@@ -73,7 +78,7 @@ export default function Matches() {
 
     fetchPage();
     return () => { cancelled = true; };
-  }, [page]);
+  }, [page, steam32]);
 
   if (loading && !paged) return <div className={styles.container}>Loading…</div>;
   if (!paged) return <div className={styles.container}>No matches found.</div>;
@@ -89,20 +94,23 @@ export default function Matches() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th className={styles.th}>Result</th>
-              <th className={styles.th}>Hero</th>
+              <th className={styles.th}>Результат</th>
+              <th className={styles.th}>Герой</th>
               <th className={styles.th}>K / D / A</th>
-              <th className={styles.th}>Duration</th>
-              <th className={styles.th}>Date</th>
-              <th className={styles.th}>Items</th>
+              <th className={styles.th}>Тривалість</th>
+              <th className={styles.th}>Дата</th>
+              <th className={styles.th}>Предмети</th>
             </tr>
           </thead>
           <tbody>
-            {items.map((m) => (
+            {items.map(m => (
               <tr key={m.matchId} className={m.isWin ? styles.winRow : styles.lossRow}>
                 <td className={styles.td}>
-                  <span className={m.isWin ? styles.winText : styles.lossText}>
-                    {m.isWin ? "WIN" : "LOSS"}
+                  <span
+                    className={`${styles.resultIcon} ${m.isWin ? styles.winIcon : styles.lossIcon
+                      }`}
+                  >
+                    {m.isWin ? 'W' : 'L'}
                   </span>
                 </td>
                 <td className={`${styles.td} ${styles.heroCell}`}>
@@ -120,10 +128,10 @@ export default function Matches() {
                   <div className={styles.items}>
                     {[m.item0, m.item1, m.item2, m.item3, m.item4, m.item5]
                       .filter(Boolean)
-                      .map((it) => (
+                      .map(it => (
                         <img
                           key={it!.id}
-                          src={it!.icon}
+                          src={it!.url_image}
                           alt={it!.name}
                           className={styles.itemIcon}
                         />

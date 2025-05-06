@@ -2,21 +2,25 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Home.module.css';
 import { ReactComponent as SteamIcon } from '../assets/steam.svg';
-
+import { useNavigate } from 'react-router-dom';
 interface Player {
-  steamId: string;
+  steamId:   string;
+  steamId32: string; 
   displayName: string;
   username: string;
 }
 
 const Home: React.FC = () => {
   const [player, setPlayer] = useState<Player | null>(null);
-
+  const navigate = useNavigate();
   // Try to load the logged-in user on mount
   useEffect(() => {
-    fetch('/api/auth/steam/me', { credentials: 'include' })  //   ← /api/...
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(setPlayer)
+    fetch('/api/auth/steam/me', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(player => {
+        // redirect to /main/STEAM32
+        navigate(`/main/${player.steamId32}`);
+      })
       .catch(() => setPlayer(null));
   }, []);
 
@@ -44,7 +48,7 @@ const Home: React.FC = () => {
     <div className={styles.hero}>
       <button className={styles.btnSteam} onClick={handleSteamLogin}>
         <SteamIcon width={20} height={20} />
-        Войти через Steam
+        Увійти через Steam
       </button>
     </div>
   );

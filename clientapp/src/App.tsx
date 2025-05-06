@@ -10,9 +10,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/main" element={<Main />} />
-        <Route path="/matches" element={<Matches />} />
-        {/* <Route path="/matches" element={<Matches />} /> */}
+        <Route path="/main/:steam32" element={<Main />} />                           // ← carry steam32 here
+        <Route path="/main/:steam32/matches" element={<Matches />} />                // ← and here, if you link “Matches” as a sub-route
       </Routes>
     </BrowserRouter>
   );
