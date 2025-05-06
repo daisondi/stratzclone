@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Main.module.css';
 import Matches from './Matches';
+import Graphics from './Graphics';
+import Recommendations from './Recommendations';
+
 type Tab = 'matches' | 'recommendations' | 'graphics';
 
 interface Player {
@@ -12,9 +15,9 @@ interface Player {
 }
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'matches', label: 'Matches' },
-  { key: 'recommendations', label: 'Recommendations' },
-  { key: 'graphics', label: 'Graphics' },
+  { key: 'matches', label: 'Матчі' },
+  { key: 'recommendations', label: 'Рекомендації' },
+  { key: 'graphics', label: 'Графіки' },
 ];
 
 const Main: React.FC = () => {
@@ -32,7 +35,7 @@ const Main: React.FC = () => {
   }, []);
 
   if (!player) {
-    return <div className={styles.loading}>Loading...</div>;
+    return <div className={styles.loading}>Завантаження...</div>;
   }
 
   const renderContent = () => {
@@ -40,9 +43,9 @@ const Main: React.FC = () => {
       case 'matches':
         return <Matches />;
       case 'recommendations':
-        return <div className={styles.content}>[Recommendations will go here]</div>;
+        return <Recommendations />;
       case 'graphics':
-        return <div className={styles.content}>[Graphics will go here]</div>;
+        return <Graphics />;
     }
   };
 
@@ -59,7 +62,7 @@ const Main: React.FC = () => {
 
       <div className={styles.tabsWrapper}>
         <div className={styles.tabs}>
-          {TABS.map((tab, idx) => (
+          {TABS.map((tab) => (
             <button
               key={tab.key}
               className={`${styles.tab} ${
@@ -73,7 +76,9 @@ const Main: React.FC = () => {
           <div
             className={styles.underline}
             style={{
-              transform: `translateX(${TABS.findIndex(t => t.key === activeTab) * 100}%)`
+              transform: `translateX(${
+                TABS.findIndex(t => t.key === activeTab) * 100
+              }%)`
             }}
           />
         </div>

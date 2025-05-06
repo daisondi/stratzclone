@@ -1,87 +1,163 @@
-/* Matches.module.css */
+:root {
+  --bg-color: #121212;
+  --border-color: #2e2e2e;
+  --win-bg: #1b3b2e;
+  --loss-bg: #3b1b1e;
+  --text-color: #e0e0e0;
+  --muted-color: #777777;
+  --accent-color: #1db954;
+  --header-bg: #1f1f1f;
+  --header-text: #ffffff;
+}
 
 .container {
-    width: 100%;
-    padding: 1rem;
-  }
-  
-  .title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  }
-  
-  .tableWrapper {
-    overflow-x: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  }
-  
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .th,
-  .td {
-    padding: 0.5rem;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-  }
-  
-  .winRow {
-    background-color: #e6f9e6;
-  }
-  
-  .lossRow {
-    background-color: #f9e6e6;
-  }
-  
-  .heroCell {
-    display: flex;
-    align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--accent-color);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-color);
+}
+
+th {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+}
+
+/* Stripe rows for readability */
+tbody tr:nth-child(odd) {
+  background-color: #141414;
+}
+
+tbody tr:hover {
+  background-color: #2e2e2e;
+}
+
+/* Highlight win/loss rows */
+.winRow {
+  background-color: var(--win-bg) !important;
+  border-left: 4px solid var(--accent-color);
+}
+
+.lossRow {
+  background-color: var(--loss-bg) !important;
+  border-left: 4px solid #e63946;
+}
+
+/* Result icons */
+.resultIcon {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.winIcon {
+  background-color: #1db954;
+}
+
+.lossIcon {
+  background-color: #e63946;
+}
+
+/* Hero cell formatting */
+.heroCell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.heroIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+
+.items {
+    /* Переходим на грид для ровно 6 колонок */
+    display: grid;
+    grid-template-columns: repeat(6, 28px);
     gap: 0.5rem;
   }
   
-  .heroIcon {
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-  }
-  
-  .items {
-    display: flex;
-    gap: 0.25rem;
-  }
-  
+  /* Сохраняем стиль иконок */
   .itemIcon {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
-  
-  .pager {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-  
-  .button {
-    padding: 0.4rem 0.8rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: white;
-    cursor: pointer;
-  }
-  
-  .button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  .pageInfo {
-    font-size: 0.9rem;
-  }
-  
+
+/* Pager styling */
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--header-bg);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover:not(:disabled) {
+  background-color: #2e2e2e;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 0.9rem;
+  color: var(--muted-color);
+}

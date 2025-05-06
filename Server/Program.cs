@@ -65,7 +65,7 @@ builder.Services.AddSingleton<IConstantsCache, ConstantsCache>();
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-app.UseCors();
+app.UseCors("AllowReact");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
